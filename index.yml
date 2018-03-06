@@ -1,0 +1,21 @@
+This is the NGOs listing API
+    This API will return all the NGOs registered
+    ---
+    tags:
+      - NGO user operations
+    
+    responses:
+      404:
+        description: Error in the server!
+      200:
+        description: list of al the NGOs
+        schema:
+          id: NGO
+          properties:
+            
+            NGOs:
+              type: array
+              description: The Registered NGO list
+              items:
+                type: string
+              default: [{"name":"Swarna Homes", "value": 500}]

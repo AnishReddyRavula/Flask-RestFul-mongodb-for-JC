@@ -1,0 +1,143 @@
+
+    Create NGO user end point
+    ---
+    tags:
+    - Create NGO user end point
+   
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: User
+          required:
+            - email
+            - name
+          properties:
+            email:
+              type: string
+              description: email for user
+            name:
+              type: string
+              description: name for user
+            address:
+              type: object
+              properties:
+                street:
+                    type: object
+                    properties:
+                        option:
+                            type: object
+                            properties:
+                                street:
+                                    type: string
+              
+            groups:
+              type: array
+              description: list of groups
+              items:
+                $ref: "#/definitions/Group"
+    responses:
+      201:
+        description: User created
+
+
+
+  Create NGO user end point
+    ---
+    tags:
+    - Create NGO user end point
+
+    parameters:
+        - in: body
+          name: body
+          schema:
+            id: NGOuser
+            required:
+                - name
+                - ngo
+            - name: name
+        in: body
+        description: Name of the user
+        schema:
+          type: object
+              properties:
+                  name:
+            type: string
+            default: "Jhon"
+                              
+           
+    responses:
+            200:
+                description: NGO user successfully created
+                schema:
+                  id: NGOuserCreated
+                  properties:
+                    code:
+                      type: string
+                    message:
+                      type: string
+                    value:
+                      schema:
+                        id: NGOFull
+                        properties:
+                            Name:
+                                type: array
+                                required: true
+                                items:
+                                    schema:
+                                        id: Name
+                            ngo:
+                                type: string
+                                required: true
+                                
+            422:
+                description: Invalid input arguments
+                schema:
+                    id: invalidInput
+                    properties:
+                        code:
+                            type: string
+                        message:
+                            type: string
+
+
+
+    Create NGO user end point
+    ---
+    tags:
+    - Create NGO user end point
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: User
+          required:
+            - password
+            - name
+          properties:
+            password:
+              type: string
+              description: password for user
+              default: minimum 6 charachters
+            name:
+              type: object
+              properties:
+                first_name:
+                    type: string
+                    description: First name of user
+                    default: John
+                last_name:
+                  type: string
+                  description: Last name of the user
+                  default: Doe
+            username:
+              type: string
+              description: Username for the login
+              default: john_doe
+    responses:
+      201:
+        description: User created
+      400:
+        Key error or bad request
+
+        

@@ -1,0 +1,38 @@
+This is the NGOs listing API
+    Chanage NGO user details end point
+    ---
+    tags:
+       - NGO user operations
+    parameters:   
+      - in: body
+        name: body
+        schema:
+          id: User
+          required:
+            - password
+            - name
+          properties:
+            password:
+              type: string
+              description: password for user
+              default: minimum 6 charachters
+            name:
+              type: object
+              properties:
+                first_name:
+                    type: string
+                    description: First name of user
+                    default: John
+                last_name:
+                  type: string
+                  description: Last name of the user
+                  default: Doe
+                username:
+                  type: string
+                  description: Username for the login
+                  default: john_doe
+    responses:
+      404:
+        description: Key error or bad request
+      201:
+        description: Data posted successfully
