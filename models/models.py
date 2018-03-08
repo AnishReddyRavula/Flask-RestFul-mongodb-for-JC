@@ -1,5 +1,8 @@
 from mongoengine import *
-import datetime.datetime
+import datetime
+
+connect("justchange")
+
 # this will be inside other fields
 class Name(EmbeddedDocument):
 	first_name = StringField(max_length = 200)
@@ -17,27 +20,21 @@ class Ngouser(Document):
 	password = StringField(max_length = 100, min_length = 6)
 	ngo =  StringField(max_length=200)
 
-
-class Details(Document):
-	name = StringField(max_length=200)
-	email = EmailField()
-	phone = StringField(max_length=20)
-	Address= StringField(max_length=300)
-
-class Contact(Document):
-	basic_details = EmbeddedDocumentField(Details)
-	registered_address = StringField(max_length=300)
+class Users(DynamicDocument):
+	meta = {
+			'collection' : 'users'
+	}
 
 class InternshipAttendance(Document):
-	intern_details = ReferenceField()
-	log_in = DateTimeField(default = datetime.now())
-	log_out = DateTimeField(default = datetime.now())
+	intern_details = ReferenceField(Users, dbref = True)
+	log_in = DateTimeField()
+	log_out = DateTimeField()
 	status = StringField(max_length = 100)
 	hours_worked = FloatField(precision = 2)
 	days_worked = IntField()
 
 class InternStatus(Document):
-	intern_details = ReferenceField(dbref = True)
+	intern_details = ReferenceField(Users, dbref = True)
 	points = IntField()
 	status = StringField(max_length = 20)
 	certificate_status = BooleanField(default = False)
