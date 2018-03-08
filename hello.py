@@ -17,7 +17,8 @@ from io import StringIO
 from io import BytesIO
 import datetime
 import pymongo
-from models.models import Ngouser, Adminuser, Name
+from pymongo import MongoClient
+from models.models import *
 from mongoengine import *
 from flask import Response
 import traceback
@@ -30,8 +31,7 @@ Swagger(app)
 
 
 #app to hold mongodb congifigration
-app.config['MONGO_DBNAME'] = 'test'
-app.config['MONGO_URI'] = 'mongodb://127.0.0.1:27017/test'
+
 allow_formats = set(['jpeg', 'png', 'gif'])
 #mongo variable to have pymongo's app
 mongo = PyMongo(app)
@@ -79,7 +79,7 @@ from flask import request, Response
 def verify(username, password):
     if not (username and password):
         return False
-    connect('start')
+    ## connect('start')
     print(username, password)
     try:	
     	usr = Adminuser.objects.filter(username = username)[0]
@@ -93,7 +93,65 @@ def verify(username, password):
     else:
     	return False
 
-    
+@app.route('/internship_attendance/<string:internid>', methods=['GET'])
+@app.route('/internship_attendance/<string:internid>/<string:in_or_out>', methods=['PUT'])
+@auth.login_required
+def internship_attendance(internid, in_or_out = None):
+	"""
+This is the NGOs listing API
+    	Chanage NGO user details end point
+    ---
+    tags:
+       - Intern Attendance
+    parameters:
+      - name: internid
+        in: path
+        type: string
+        description: userid of that user or intern
+        required: true
+      - name: in_or_out
+        in: path
+        type: string
+        description: use "in" for login "out" for logout
+	"""
+	# client = MongoClient('localhost', 27017)
+	# db = client.justchange
+	# usr = db.users
+	# usr = usr.find_one({"_id" : internid})
+	print((internid))
+	# connect('justchange')
+	# print(Users.objects.all())
+	# print(usr)
+	usr = Users.objects.filter(id = internid)[0]
+	print(type(request.method) , in_or_out)	
+	if request.method == 'GET' and internid is not None:
+		intern_att_listing = InternshipAttendance.objects.filter(intern_details = internid)
+		attendance_details = intern_att_listing.to_json()
+		attendance_details = json.loads(attendance_details)
+		ref_id = attendance_details[0]['intern_details']['$id']['$oid']
+		user_details = Users.objects.exclude('pwd').get(id = ref_id)
+		user_details = user_details.to_json()
+		for ind, _ in enumerate(attendance_details):
+			attendance_details[ind]['intern_details'] = json.loads(user_details)
+		return json.dumps({'success': attendance_details}), 201, {'ContentType':'application/json'}
+
+	if request.method == 'PUT' and internid is not None:
+		# print("")
+		
+		
+		if 'in' in in_or_out:
+			int_att = InternshipAttendance()
+			int_att.intern_details = usr
+			int_att.log_in = datetime.datetime.now()
+
+		if 'out' in in_or_out:
+			int_att = InternshipAttendance.objects.filter(intern_details = usr).order_by('-id').first()
+			int_att.log_out = datetime.datetime.now()
+		int_att.save()
+		return json.dumps({'success':usr['name']}), 201, {'ContentType':'application/json'}
+	else:
+		return json.dumps({'success':usr['name']}), 201, {'ContentType':'application/json'}
+
 
 
 @app.route('/ngo_change/<string:username>', methods=['PUT'])
@@ -103,7 +161,7 @@ def change_ngouser(username):
 
 	# product = mongo.db.start
 	print(request.json)
-	connect('start')	#connecting to database
+	#connect('start')	#connecting to database
 	ngouser_data = request.json 	#getting the posted data
 
 
@@ -147,7 +205,7 @@ def add_ngo_user():
 
 	# product = mongo.db.start
 	print(request.json)
-	connect('start')	#connecting to database
+	#connect('start')	#connecting to database
 	ngo_data = request.json 	#getting the posted data
 	ngouser = Ngouser()		#model object for ngo user
 
@@ -211,7 +269,7 @@ def list_ngousers():
 	                type: string
 	              default: [{"name":"Swarna Homes", "username": "swarna_homes"}]
 	"""
-	connect('start')	#connecting to database
+	#connect('start')	#connecting to database
 	ngousers_list = Ngouser.objects.only('username', 'name')
 	output = []
 	for obj in ngousers_list:
@@ -283,8 +341,9 @@ def add_admin():
 	      - in: body
 	        name: body
 	        schema:
-	          id: User
+	          id: Admin
 	          required:
+	            - username
 	            - password
 	            - name
 	          properties:
@@ -317,7 +376,7 @@ def add_admin():
 
 	# product = mongo.db.start
 	print(request.json)
-	connect('start')	#connecting to database
+	connect('justchange')	#connecting to database
 	admin_data = request.json 	#getting the posted data
 	adminuser_obj = Adminuser()		#model object for ngo user
 
