@@ -24,6 +24,7 @@ class Users(DynamicDocument):
 	meta = {
 			'collection' : 'users'
 	}
+	account_type = StringField(max_length=50, default="user")
 
 class InternshipAttendance(Document):
 	intern_details = ReferenceField(Users, dbref = True)

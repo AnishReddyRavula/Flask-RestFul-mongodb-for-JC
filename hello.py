@@ -154,6 +154,89 @@ This is the NGOs listing API
 
 
 
+
+
+
+@app.route('/account_status/<string:username>/', methods=['POST'])
+@app.route('/account_status/<string:username>/', methods=['GET'])
+@auth.login_required
+def account_status(username):
+	"""
+Here we can change the status of account
+    	Change Account status
+    ---
+    tags:
+       - Account status change
+    get:
+	    parameters:
+	      - name: username
+	        in: path
+	        type: string
+	        description: username of that user 
+	        required: true
+	    responses:
+	      201:
+	        description: error
+    post:
+	    parameters:
+	      - name: username
+	        in: path
+	        type: string
+	        description: username of that user 
+	        required: true
+	      - name: body
+	        in: body
+	        schema:
+	          properties:
+	            username:
+	              type: string
+	              description: username of the account whose status needs to be changed
+	              default: jc_change
+	            account_type:
+	              type: string
+	              description: account type admin or ngouser or user
+	              default: user admin or ngouser
+	    responses:
+	      201: 
+	        description: Sucees, status changed
+	      401:
+	        description: error
+	"""
+
+	print((username))
+	if request.method == 'GET':
+		account_type = Users.objects.filter(email_id = username)[0].account_type
+		return json.dumps({'success': True, 'account_type': account_type}), 201, {'ContentType': 'application/json'}
+		
+	if request.method == 'POST':
+
+		post_data = request.json
+		print(post_data['account_type'])
+
+		if 'username' not in post_data or 'account_type' not in post_data:
+			return json.dumps({'success': False, "reason": "check keys"}), 401, {'ContentType': 'application/json'}
+
+		if 'user' is post_data['account_type'] or 'admin' == post_data['account_type'] or 'ngouser' == post_data['account_type']:
+			return json.dumps({'success': False, "reason": "check account type"}), 401, {'ContentType': 'application/json'}
+
+		if username == post_data['username']:
+			if len(Users.objects.filter(email_id = username)) > 1:
+				return json.dumps({'success': False, "reason": "username is not unique"}), 401, {'ContentType': 'application/json'}
+
+			if len(Users.objects.filter(email_id = username)) == 0:
+				return json.dumps({'success': False, "reason": "username not present"}), 401, {'ContentType': 'application/json'}
+
+			print(Users.objects.filter(email_id = username))
+			usr = Users.objects(email_id = username).update_one(account_type = post_data['account_type'])
+			return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}	
+		else:
+			return json.dumps({'success': False, "reason": "check username in url and body"}), 401, {'ContentType': 'application/json'}
+
+	return json.dumps({'success': False}), 201, {'ContentType':'application/json'}
+
+
+
+
 @app.route('/ngo_change/<string:username>', methods=['PUT'])
 @auth.login_required
 @swag_from('modify_ngouser.yml', methods=['PUT'])
