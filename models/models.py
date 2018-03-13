@@ -41,8 +41,15 @@ class InternStatus(Document):
 	certificate_status = BooleanField(default = False)
 
 
-class Ngo(Document):
-	pass
+class NGOs(DynamicDocument):
+	meta = {
+			'collection' : 'NGOs'
+	}
+
+class subCategories(DynamicDocument):
+	meta = {
+			'collection' : 'subCategories'
+	}
 
 
 class Funding(Document):

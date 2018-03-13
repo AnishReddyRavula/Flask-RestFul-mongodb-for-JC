@@ -1,0 +1,201 @@
+Operations on NGOs
+    NGO operations
+    ---
+    tags:
+       - NGO operations
+    get:
+      responses:
+        201:
+          description: error
+    post:
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: body
+          in: body
+          schema:
+            title: NGO details
+            required:
+              - name
+            properties:
+              name:
+                in: formData
+                type: string
+                required: true
+                description: name of the NGO
+                default: Samhitha Trust
+              registeredUnder:
+                in: formData
+                type: string
+                description: Under which act this NGO gor registered
+                default: Society's ACT
+              establishedYear:
+                in: formData
+                type: integer
+                description: year in which this got registered
+                default: 2005
+              noOfBeneficiaries:
+                in: formData
+                type: integer
+                description: number of benefieries in the NGO
+                default: 100
+              founderName:
+                in: formData
+                type: string
+                description: name of the founder
+                default: Mr. Kushal
+              founderUserName:
+                in: formData
+                type: string
+                description: username of the founder
+                default: kushal_kumar@gmail.com
+              emailID:
+                in: formData
+                type: string
+                description: emailIDof the NGO
+                default: samhitha@trust.com
+              landline:
+                in: formData
+                type: string
+                description: landline of the NGO
+                default: 040-24058963
+              contactPerson1:
+                in: formData
+                type: string
+                description: username of the contactPerson1
+                default: varun@gmail.com
+              contactPerson1Designation:
+                in: formData
+                type: string
+                description: description of the contactPerson1
+                default: Operations
+              tax_exemtion_type:
+                in: formData
+                type: string
+                description: tax exemption category
+                default: 80G (50% Exemption), 12A
+              staff_strength:
+                in: formData
+                type: integer
+                description: stength of staff in NGO
+                default: 25
+              desc:
+                type: string
+                description: about the NGO
+                default: Noble educational empowerment society (NEES), one of the fastest growing social development organizations in Telangana in the area of skill development, is a secular, non-political and not for profit organisation. Inspired by the concept of 'Each one Help one', NEES has its prime focus on skill development training with placement assistance to unemployed unskilled dropout youth, leading to their empowerment. NEES strongly believes that only education and empowerment of the youth can change the destiny of the nation.Vision :To eradicate poverty, hunger, injustice and discrimination of all forms.   To educate and empower each and every section of the society.
+              isBookmarked:
+                type: boolean
+                description: whether it is bookmarked or not
+                default: false
+              category:
+                type: string
+                description: category of the NGO
+                default: Skill development
+              registeredAddress:
+                title: registeredAddress
+                type: object
+                properties:
+                  addressLine:
+                    type: string
+                    description: address line 1
+                    default: 3-6-145/7/A,1st floor,Street No-17
+                  city:
+                    type: string
+                    description: Hyderabad
+                    default: Hyderabad
+                  state:
+                    type: string
+                    description: state of the NGO
+                    default: Telangana
+                  area:
+                    type: string
+                    description: Area of the NGO
+                    default: Himayatnagar
+                  pinCode: 
+                    type: string
+                    description: pincode of the address
+                    default: 500029
+                  longlat:
+                    type: array
+                    example: [17.401583,78.483028]
+              currentAddress:
+                title: currentAddress
+                type: object
+                properties:
+                  addressLine:
+                    type: string
+                    description: address line 1
+                    default: 3-6-145/7/A,1st floor,Street No-17
+                  city:
+                    type: string
+                    description: Hyderabad
+                    default: Hyderabad
+                  state:
+                    type: string
+                    description: state of the NGO
+                    default: Telangana
+                  area:
+                    type: string
+                    description: Area of the NGO
+                    default: Himayatnagar
+                  pinCode: 
+                    type: string
+                    description: pincode of the address
+                    default: 500029
+                  longlat:
+                    type: array
+                    example: [17.401583,78.483028]
+              isDeactivated:
+                type: boolean
+                description: True if the NGO is not active
+                default: false
+              donationCategories: 
+                type: array
+                description: array of subcategories objectid's
+                example: ['5916b3d5ecdf639382550f07', '5916b3d5ecdf639382550f08']
+              ngoCategories: 
+                type: array
+                description: array of subcategories objectid's
+                example: ['5916b3d5ecdf639382550f07', '5916b3d5ecdf639382550f08']
+              banners: 
+                type: array
+                description: array of banner image names
+                example: ['image1.jpg', 'image4.jpg']
+              individualDonors:
+                type: boolean
+                description: are the doners individuals
+                default: false
+              governmentFunding:
+                type: boolean
+                description: is the government funcding available
+                default: false
+              foreignContributions:
+                type: boolean
+                default: false
+              friendsAndFamily:
+                type: boolean
+                default: false
+              csrContributions:
+                type: boolean
+                default: false
+              computerAvailable:
+                type: boolean
+                default: false
+              internetAvailable:
+                type: boolean
+                default: false
+              smartPhoneAvailable:
+                type: boolean
+                default: false
+                type: boolean
+                default: false
+              fcraRegistered:
+                type: boolean
+                default: false
+
+
+      responses:
+        201: 
+          description: Sucees, status changed
+        401:
+          description: error

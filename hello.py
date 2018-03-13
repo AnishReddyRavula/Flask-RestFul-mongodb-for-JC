@@ -103,16 +103,24 @@ This is the NGOs listing API
     ---
     tags:
        - Intern Attendance
-    parameters:
-      - name: internid
-        in: path
-        type: string
-        description: userid of that user or intern
-        required: true
-      - name: in_or_out
-        in: path
-        type: string
-        description: use "in" for login "out" for logout
+    get:
+        parameters:
+          - name: internid
+            in: path
+            type: string
+            description: userid of that user or intern
+            required: true
+    put:
+        parameters:
+          - name: internid
+            in: path
+            type: string
+            description: userid of that user or intern
+            required: true
+          - name: in_or_out
+            in: path
+            type: string
+            description: use "in" for login "out" for logout
 	"""
 	# client = MongoClient('localhost', 27017)
 	# db = client.justchange
@@ -207,7 +215,7 @@ Here we can change the status of account
 	if request.method == 'GET':
 		account_type = Users.objects.filter(email_id = username)[0].account_type
 		return json.dumps({'success': True, 'account_type': account_type}), 201, {'ContentType': 'application/json'}
-		
+
 	if request.method == 'POST':
 
 		post_data = request.json
@@ -233,6 +241,50 @@ Here we can change the status of account
 			return json.dumps({'success': False, "reason": "check username in url and body"}), 401, {'ContentType': 'application/json'}
 
 	return json.dumps({'success': False}), 201, {'ContentType':'application/json'}
+
+
+
+
+@app.route('/add_ngo/', methods=['POST'])
+@app.route('/add_ngo/', methods=['GET'])
+@auth.login_required
+@swag_from('NGO_operations.yml', methods=['GET', 'POST'])
+def Ngos_operations():
+
+	if request.method == 'GET':
+		ngos = NGOs.objects.all()
+		ngos = ngos.to_json()
+		ngos = json.loads(ngos)
+		return json.dumps({'success': True, 'ngos': ngos}), 201, {'ContentType': 'application/json'}
+	try:	
+		if request.method == 'POST':
+
+			post_data = request
+			print(post_data.json)
+			ngo = NGOs(**post_data.json)
+			ngo.save()
+			
+
+			# if 'user' is post_data['account_type'] or 'admin' == post_data['account_type'] or 'ngouser' == post_data['account_type']:
+			# 	return json.dumps({'success': False, "reason": "check account type"}), 401, {'ContentType': 'application/json'}
+
+			# if username == post_data['username']:
+			# 	if len(Users.objects.filter(email_id = username)) > 1:
+			# 		return json.dumps({'success': False, "reason": "username is not unique"}), 401, {'ContentType': 'application/json'}
+
+			# 	if len(Users.objects.filter(email_id = username)) == 0:
+			# 		return json.dumps({'success': False, "reason": "username not present"}), 401, {'ContentType': 'application/json'}
+
+			# 	print(Users.objects.filter(email_id = username))
+			# 	usr = Users.objects(email_id = username).update_one(account_type = post_data['account_type'])
+			# 	return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}	
+			# else:
+			# 	return json.dumps({'success': False, "reason": "check username in url and body"}), 401, {'ContentType': 'application/json'}
+	except Exception as e:
+		err = traceback.format_exception_only(type(e), e)
+		print(err)
+	return json.dumps({'success': False}), 201, {'ContentType':'application/json'}
+
 
 
 
