@@ -1,0 +1,89 @@
+Edit information of a user
+Edit information of the user
+    ---
+    tags:
+      - User Operations
+    put:
+      parameters:
+        - name: userEmail
+          in: path
+          type: string
+          description: emailID of the user
+          required: true  
+        - name: body
+          in: body
+          schema:
+            title: User details
+            required:
+              - name
+            properties:
+              name:
+                in: formData
+                type: string
+                required: true
+                description: name of the user
+                default: Samhitha Kumar
+              email_id:
+                in: formData
+                type: string
+                description: emailid of the user
+                default: roy@justchange.in
+              about:
+                in: formData
+                type: string
+                description: about the user
+                default: I am a cool person
+              dob:
+                in: formData
+                type: string
+                description: date of birth of the user
+                default: 21/06/2003
+              phone_number: 
+                in: formData
+                type: string
+                description: phone number of the user
+                default: 98798098763
+              address:
+                title: address
+                type: object
+                properties:
+                  addressLine:
+                    type: string
+                    description: address line 1
+                    default: 3-6-145/7/A,1st floor,Street No-17
+                  city:
+                    type: string
+                    description: Hyderabad
+                    default: Hyderabad
+                  state:
+                    type: string
+                    description: state of the NGO
+                    default: Telangana
+                  area:
+                    type: string
+                    description: Area of the NGO
+                    default: Himayatnagar
+                  pinCode: 
+                    type: string
+                    description: pincode of the address
+                    default: 500029
+                  longlat:
+                    type: array
+                    example: [17.401583,78.483028]
+              gender:
+                type: string
+                description: gender of the user
+                default: female
+              register_agent:
+                type: string
+                description: through which agen registered
+                default: form
+              age:
+                type: integer
+                description: age of the user in integers
+                default: 23
+      responses:
+        201: 
+          description: Sucees, status changed
+        401:
+          description: error

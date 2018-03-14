@@ -1,0 +1,26 @@
+Adding or Editing internship
+    Adding or Editing Internship
+    ---
+    tags:
+       - Internship Operations
+    get:
+      responses:
+        201:
+          description: error
+    post:
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: body
+          in: body
+          schema:
+            title: NGO details
+            required:
+              - name
+            properties:
+              name:
+                in: formData
+                type: string
+                required: true
+                description: name of the NGO
+                default: Samhitha Trust

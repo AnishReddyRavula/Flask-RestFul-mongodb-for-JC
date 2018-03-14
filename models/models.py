@@ -25,6 +25,7 @@ class Users(DynamicDocument):
 			'collection' : 'users'
 	}
 	account_type = StringField(max_length=50, default="user")
+	dob = DateTimeField()
 
 class InternshipAttendance(Document):
 	intern_details = ReferenceField(Users, dbref = True)
@@ -41,16 +42,41 @@ class InternStatus(Document):
 	certificate_status = BooleanField(default = False)
 
 
-class NGOs(DynamicDocument):
-	meta = {
-			'collection' : 'NGOs'
-	}
 
 class subCategories(DynamicDocument):
 	meta = {
 			'collection' : 'subCategories'
 	}
 
+
+
+
+class categories(DynamicDocument):
+	meta = {
+			'collection' : 'categories'
+	}
+
+
+class NGOs(DynamicDocument):
+	meta = {
+			'collection' : 'NGOs'
+	}
+	category = ReferenceField(categories, dbref = True)
+	donationCategories = ListField(ReferenceField(subCategories, dbref = True))
+	ngoCategories = ListField(ReferenceField(subCategories, dbref = True))
+
+class internships(DynamicDocument):
+	meta = {
+		'collection': 'internships'
+	}
+
+class internshipMappers(DynamicDocument):
+	meta = {
+		'collection': 'internshipMappers'
+	}
+	internship = ReferenceField(internships, dbref=True)
+	intern_details = ReferenceField(Users, dbref=True)
+	mentor = ReferenceField(Users, dbref=True)
 
 class Funding(Document):
 	pass
