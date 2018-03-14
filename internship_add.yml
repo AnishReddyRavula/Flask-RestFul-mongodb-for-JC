@@ -1,0 +1,104 @@
+Adding or Editing internship
+Adding or Editing Internship
+    ---
+    tags:
+       - Internship Operations
+    put:
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: internshipID
+          in: path
+          type: string
+          description: objectID of the internship
+          required: true
+        - name: body
+          in: body
+          schema:
+            title: NGO details
+            required:
+              - title
+            properties:
+              title:
+                in: formData
+                type: string
+                required: true
+                description: title of the internship
+                default: Finance Internship
+              startDate:
+                in: formData
+                type: string
+                description: starting date of the internship
+                default: 21/06/2003
+              endDate:
+                in: formData
+                type: string
+                description: ending date of the internship
+                default: 21/06/2003
+              ngo:
+                in: formData
+                type: string
+                description: id of the ngo posting the internship
+                default: 59c00ef2e2a7211e14853d85
+              jobRole:
+                in: formData
+                type: string
+                description: job role of the intern jobroleid
+                default: 59f22220e2a7211e14853ddc
+              status:
+                in: formData
+                type: string
+                description: status of the approval of the internship by the admin
+                default: pending
+              isDeactivated:
+                in: formData
+                type: boolean
+                description: whether the internship is isDeactivated can be done by ngo or admin
+                default: False
+              timing:
+                in: formData
+                type: string
+                description: the timing for internships
+                default: 10am-1pm
+              Operational_Days:
+                in: formData
+                type: integer
+                description: number of working days required for internship
+                default: 60
+              workHours:
+                in: formData
+                type: integer
+                description: number of work hours required per day
+                default: 3  
+              location:
+                title: location
+                type: object
+                properties:
+                  addressLine:
+                    type: string
+                    description: address line 1
+                    default: 3-6-145/7/A,1st floor,Street No-17
+                  city:
+                    type: string
+                    description: Hyderabad
+                    default: Hyderabad
+                  state:
+                    type: string
+                    description: state of the NGO
+                    default: Telangana
+                  area:
+                    type: string
+                    description: Area of the NGO
+                    default: Himayatnagar
+                  pinCode: 
+                    type: string
+                    description: pincode of the address
+                    default: 500029
+                  longlat:
+                    type: array
+                    example: [17.401583,78.483028]
+              max_intern_count:
+                type: integer
+                description: maximum number of interns allowed for the internship
+                default: 1
+

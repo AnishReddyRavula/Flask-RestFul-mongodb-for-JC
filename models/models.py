@@ -26,6 +26,10 @@ class Users(DynamicDocument):
 	}
 	account_type = StringField(max_length=50, default="user")
 	dob = DateTimeField()
+	email_id = StringField(unique=True)
+
+	def __unicode__(self):
+		return self.name
 
 class InternshipAttendance(Document):
 	intern_details = ReferenceField(Users, dbref = True)
@@ -65,10 +69,21 @@ class NGOs(DynamicDocument):
 	donationCategories = ListField(ReferenceField(subCategories, dbref = True))
 	ngoCategories = ListField(ReferenceField(subCategories, dbref = True))
 
+class jobRole(DynamicDocument):
+	meta = {
+		'collection': 'jobRole'
+	}
+
 class internships(DynamicDocument):
 	meta = {
 		'collection': 'internships'
 	}
+	ngo = ReferenceField(NGOs, dbref = True)
+	jobRole = ReferenceField(jobRole, dbref = True)
+	startDate = DateTimeField()
+	endDate = DateTimeField()
+	isDeactivated = BooleanField(default = False)
+	max_intern_count = IntField()
 
 class internshipMappers(DynamicDocument):
 	meta = {

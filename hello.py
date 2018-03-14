@@ -83,14 +83,14 @@ def verify(username, password):
     ## connect('start')
     print(username, password)
     try:	
-    	usr = Adminuser.objects.filter(username = username)[0]
+    	usr = Users.objects.get(email_id = username)
     except Exception as e:
     	print(e)
     	return False
     if len(usr) == 0:
     	return False
-    if usr['password'] == password:
-    	g.user = usr['username']
+    if usr['pwd'] == password:
+    	g.user = usr['account_type']
     	return True
     else:
     	return False
@@ -446,12 +446,33 @@ def Ngos_operations(ngoid=None):
 
 
 
-# # @app.route('/add_ngo/', methods=['GET'])
-# # @app.route('/add_ngo/<string:ngoid>', methods=['PUT'])
-# @auth.login_required
-@app.route('/internship_add', methods=['POST'])
-@swag_from('internship_add.yaml', methods=['POST'])
-def internship_add(internshipid=None):
+@app.route('/internship_add/<string:internshipID>', methods=['PUT'])
+@auth.login_required
+@swag_from('internship_add.yml', methods=['PUT'])
+def internship_add(internshipID=None):
+	if request.method == 'PUT':
+		post_data = request.json
+		if 'startDate' in post_data:
+			if post_data['startDate'] is "":
+				post_data['startDate'] = None 
+			else:
+				post_data['startDate'] = datetime.strptime(post_data['startDate'], "%d/%m/%Y")
+		if 'endDate' in post_data:
+			if post_data['endDate'] is "":
+				post_data['endDate'] = None 
+			else:
+				post_data['endDate'] = datetime.strptime(post_data['endDate'], "%d/%m/%Y")	
+		if 'jobRole' in post_data:
+			post_data['jobRole'] = jobRole.objects.get(id = post_data['jobRole'])
+		if 'ngo' in post_data:
+			post_data['ngo'] = NGOs.objects.get(id = post_data['ngo'])
+		if 'admin' == g.user:
+			post_data['status'] = "approved"
+		else:
+			post_data['status'] = "pending"
+		print(post_data)
+		print(internships.objects.get(id = internshipID).modify(**post_data))
+		
 	return json.dumps({'sd':5}), 201, {'ContentType':'application/json'}
 
 
