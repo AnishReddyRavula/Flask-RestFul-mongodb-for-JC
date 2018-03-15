@@ -98,32 +98,8 @@ def verify(username, password):
 @app.route('/internship_attendance/<string:internid>', methods=['GET'])
 @app.route('/internship_attendance/<string:internid>/<string:in_or_out>', methods=['PUT'])
 @auth.login_required
+@swag_from('intern_attendence.yml', methods=['PUT', 'GET'])
 def internship_attendance(internid, in_or_out = None):
-	"""
-This is the NGOs listing API
-    	Chanage NGO user details end point
-    ---
-    tags:
-       - Intern Attendance
-    get:
-        parameters:
-          - name: internid
-            in: path
-            type: string
-            description: userid of that user or intern
-            required: true
-    put:
-        parameters:
-          - name: internid
-            in: path
-            type: string
-            description: userid of that user or intern
-            required: true
-          - name: in_or_out
-            in: path
-            type: string
-            description: use "in" for login "out" for logout
-	"""
 	# client = MongoClient('localhost', 27017)
 	# db = client.justchange
 	# usr = db.users
@@ -146,9 +122,6 @@ This is the NGOs listing API
 		return json.dumps({'success': attendance_details}), 201, {'ContentType':'application/json'}
 
 	if request.method == 'PUT' and internid is not None:
-		# print("")
-		
-		
 		if 'in' in in_or_out:
 			int_att = InternshipAttendance()
 			int_att.intern_details = usr
@@ -170,49 +143,9 @@ This is the NGOs listing API
 @app.route('/account_status/<string:userEmail>/', methods=['PUT'])
 @app.route('/account_status/<string:userEmail>/', methods=['GET'])
 @auth.login_required
+@swag_from('account_status.yml', methods=['PUT', 'GET'])
 def account_status(userEmail):
-	"""
-Here we can change the status of account
-    	Change Account status
-    ---
-    tags:
-       - User Operations
-    get:
-	    parameters:
-	      - name: userEmail
-	        in: path
-	        type: string
-	        description: userEmail of that user 
-	        required: true
-	    responses:
-	      201:
-	        description: error
-    put:
-	    parameters:
-	      - name: userEmail
-	        in: path
-	        type: string
-	        description: userEmail of that user 
-	        required: true
-	      - name: body
-	        in: body
-	        schema:
-	          properties:
-	            userEmail:
-	              type: string
-	              description: userEmail of the account whose status needs to be changed
-	              default: jc_change
-	            account_type:
-	              type: string
-	              description: account type admin or ngouser or user
-	              default: user admin or ngouser
-	    responses:
-	      201: 
-	        description: Sucees, status changed
-	      401:
-	        description: error
-	"""
-
+	
 	print((userEmail))
 	if request.method == 'GET':
 		account_type = Users.objects.filter(email_id = userEmail)[0].account_type
@@ -248,101 +181,9 @@ Here we can change the status of account
 
 
 @app.route('/user_edit/<string:userEmail>/', methods=['PUT'])
-# @swag_from('userEdit.yml', methods=['PUT'])
 @auth.login_required
+@swag_from('userEdit.yml', methods=['PUT'])
 def user_edit(userEmail):
-	"""
-Edit information of a user
-Edit information of the user
-    ---
-    tags:
-      - User Operations
-    put:
-      parameters:
-        - name: userEmail
-          in: path
-          type: string
-          description: emailID of the user
-          required: true  
-        - name: body
-          in: body
-          schema:
-            title: User details
-            required:
-              - name
-            properties:
-              name:
-                in: formData
-                type: string
-                required: true
-                description: name of the user
-                default: Samhitha Kumar
-              email_id:
-                in: formData
-                type: string
-                description: emailid of the user
-                default: roy@justchange.in
-              about:
-                in: formData
-                type: string
-                description: about the user
-                default: I am a cool person
-              dob:
-                in: formData
-                type: string
-                description: date of birth of the user
-                default: 21/06/2003
-              phone_number: 
-                in: formData
-                type: string
-                description: phone number of the user
-                default: 98798098763
-              address:
-                title: address
-                type: object
-                properties:
-                  addressLine:
-                    type: string
-                    description: address line 1
-                    default: 3-6-145/7/A,1st floor,Street No-17
-                  city:
-                    type: string
-                    description: Hyderabad
-                    default: Hyderabad
-                  state:
-                    type: string
-                    description: state of the NGO
-                    default: Telangana
-                  area:
-                    type: string
-                    description: Area of the NGO
-                    default: Himayatnagar
-                  pinCode: 
-                    type: string
-                    description: pincode of the address
-                    default: 500029
-                  longlat:
-                    type: array
-                    example: [17.401583,78.483028]
-              gender:
-                type: string
-                description: gender of the user
-                default: female
-              register_agent:
-                type: string
-                description: through which agen registered
-                default: form
-              age:
-                type: integer
-                description: age of the user in integers
-                default: 23
-      responses:
-        201: 
-          description: Sucees, status changed
-        401:
-          description: error
-	"""
-	
 	print((userEmail))
 	if request.method == 'PUT':
 
@@ -354,21 +195,6 @@ Edit information of the user
 		post_data['dob'] =  datetime.strptime(post_data['dob'], "%d/%m/%Y")
 		usr = Users.objects(email_id = userEmail).update(**post_data)
 		# usr.save()
-		# if 'user' is post_data['account_type'] or 'admin' == post_data['account_type'] or 'ngouser' == post_data['account_type']:
-		# 	return json.dumps({'success': False, "reason": "check account type"}), 401, {'ContentType': 'application/json'}
-
-		# if username == post_data['username']:
-		# 	if len(Users.objects.filter(email_id = username)) > 1:
-		# 		return json.dumps({'success': False, "reason": "username is not unique"}), 401, {'ContentType': 'application/json'}
-
-		# 	if len(Users.objects.filter(email_id = username)) == 0:
-		# 		return json.dumps({'success': False, "reason": "username not present"}), 401, {'ContentType': 'application/json'}
-
-		# 	print(Users.objects.filter(email_id = username))
-		# 	usr = Users.objects(email_id = username).update_one(account_type = post_data['account_type'])
-		# 	return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}	
-		# else:
-		# 	return json.dumps({'success': False, "reason": "check username in url and body"}), 401, {'ContentType': 'application/json'}
 
 	return json.dumps({'success': False}), 201, {'ContentType':'application/json'}
 
@@ -383,7 +209,7 @@ Edit information of the user
 @auth.login_required
 @swag_from('NGO_operations.yml', methods=['GET', 'POST', 'PUT'])
 def Ngos_operations(ngoid=None):
-
+	print(request.headers)
 	if request.method == 'GET':
 		ngos = NGOs.objects.all()
 		ngos = ngos.to_json()

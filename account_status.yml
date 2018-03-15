@@ -1,0 +1,39 @@
+Here we can change the status of account
+Change Account status
+    ---
+    tags:
+       - User Operations
+    get:
+      parameters:
+        - name: userEmail
+          in: path
+          type: string
+          description: userEmail of that user 
+          required: true
+      responses:
+        201:
+          description: error
+    put:
+      parameters:
+        - name: userEmail
+          in: path
+          type: string
+          description: userEmail of that user 
+          required: true
+        - name: body
+          in: body
+          schema:
+            properties:
+              userEmail:
+                type: string
+                description: userEmail of the account whose status needs to be changed
+                default: jc_change
+              account_type:
+                type: string
+                description: account type admin or ngouser or user
+                default: user admin or ngouser
+      responses:
+        201: 
+          description: Sucees, status changed
+        401:
+          description: error

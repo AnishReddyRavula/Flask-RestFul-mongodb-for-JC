@@ -1,0 +1,23 @@
+This is the NGOs listing API
+Chanage NGO user details end point
+    ---
+    tags:
+       - Intern Attendance
+    get:
+        parameters:
+          - name: internid
+            in: path
+            type: string
+            description: userid of that user or intern
+            required: true
+    put:
+        parameters:
+          - name: internid
+            in: path
+            type: string
+            description: userid of that user or intern
+            required: true
+          - name: in_or_out
+            in: path
+            type: string
+            description: use "in" for login "out" for logout
