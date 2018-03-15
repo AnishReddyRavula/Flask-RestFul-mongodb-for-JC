@@ -303,6 +303,52 @@ def internship_add(internshipID=None):
 
 
 
+@app.route('/intern_map', methods=['POST'])
+@app.route('/intern_map/<string:internshipID>', methods=['PUT'])
+@auth.login_required
+@swag_from('intern_map.yml', methods=['POST', 'PUT'])
+def intern_map():
+
+	if method.request == 'POST':
+		post_data = request.json
+		if 'internshipID' not in post_data or 'userEmail' not in post_data or 'status' not in post_data:
+			json.dumps({'success': False, 'reason': 'Check keys'})
+		internshipID = post_data['internshipID']
+		userEmail = post_data['userEmail']
+		status = post_data['status']
+		intrn = internships.objects.get(id = internshipID)
+		usr = Users.objects.get(email_id = userEmail)
+		int_map = internshipMappers(internship = intrn, intern = usr, status = status).save()
+
+	if request.method == 'PUT':
+		intrn = internships.objects.get(id = internshipID)
+		post_data = request.json
+		if 'userEmail' not in post_data or 'status' not in post_data:
+			json.dumps({'success': False, 'reason': 'Check keys'})
+		userEmail = post_data['userEmail']
+		usr = Users.objects.get(email_id = userEmail)
+		int_mapper = internshipMappers.objects.get(internship = intrn, intern = usr)
+		int_mapper.status = post_data['status']
+		if 'mentorEmail' in post_data and post_data['status'] == 'approved':
+			mentor = Users.objects.get(email_id = post_data['mentorEmail'])
+			int_mapper.mentor = mentor
+		int_mapper.save()
+
+
+	return json.dumps({'sd':5}), 201, {'ContentType': 'application/json'}
+
+
+
+@app.route('/internship_details/<string:internshipID>')
+@auth.login_required
+@swag_from('internship_details.yml', methods=['GET'])
+def internship_details(internshipID):
+	if request.method == 'GET':
+		intrn = internships.objects.get(id = internshipID)
+
+
+	return json.dumps({'sd':5}), 201, {'ContentType': 'application/json'}
+
 
 
 

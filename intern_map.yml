@@ -1,0 +1,65 @@
+This is the NGOs listing API
+Chanage NGO user details end point
+    ---
+    tags:
+       - Internship Operations
+    put:
+        parameters:
+          - name: internshipID
+            in: path
+            type: string
+            description: internship objectID
+            required: true
+          - name: body
+            in: body
+            schema:
+              required:
+                - userEmail
+                - status
+              properties:
+                userEmail:
+                  type: string
+                  description: emailid of the user applied for internship
+                  default: roy@justchange.in
+                status:
+                  type: string
+                  description: approved pending rejected status for the applicant
+                  default: pending
+                mentorEmail:
+                  type: string
+                  description: emailid of the mentor
+                  default: roy@justchange.in
+        responses:
+          201: 
+            description: Sucees, status changed
+          401:
+            description: error
+    post:
+        parameters:
+          - name: body
+            in: body
+            schema:
+              title: intern mapper
+              required:
+                - internshipID
+                - userEmail
+                - status
+              properties:
+                internshipID:
+                  type: string
+                  description: objectID of the internship
+                  default: sds
+                userEmail:
+                  type: string
+                  description: emailid of the user applied for internship
+                  default: roy@justchange.in
+                status:
+                  type: string
+                  description: approved pending rejected status for the applicant
+                  default: pending
+        responses:
+          201: 
+            description: Sucees, status changed
+          401:
+            description: error
+

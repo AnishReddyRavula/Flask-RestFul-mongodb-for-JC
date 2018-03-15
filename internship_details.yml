@@ -1,0 +1,12 @@
+This is the NGOs listing API
+Chanage NGO user details end point
+    ---
+    tags:
+       - Internship Operations
+    get:
+        parameters:
+          - name: internshipID
+            in: path
+            type: string
+            description: internship objectID
+            required: true
