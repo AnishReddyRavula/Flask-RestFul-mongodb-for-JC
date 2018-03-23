@@ -83,14 +83,14 @@ def verify(username, password):
     ## connect('start')
     print(username, password)
     try:	
-    	usr = Users.objects.get(email_id = username)
+    	usr = users.objects.get(email_id = username)
     except Exception as e:
     	print(e)
     	return False
     if len(usr) == 0:
     	return False
     if usr['pwd'] == password:
-    	g.user = usr['account_type']
+    	g.user = usr
     	return True
     else:
     	return False
@@ -106,16 +106,16 @@ def internship_attendance(internid, in_or_out = None):
 	# usr = usr.find_one({"_id" : internid})
 	print((internid))
 	# connect('justchange')
-	# print(Users.objects.all())
+	# print(users.objects.all())
 	# print(usr)
-	usr = Users.objects.filter(id = internid)[0]
+	usr = users.objects.filter(id = internid)[0]
 	print(type(request.method) , in_or_out)	
 	if request.method == 'GET' and internid is not None:
 		intern_att_listing = InternshipAttendance.objects.filter(intern_details = internid)
 		attendance_details = intern_att_listing.to_json()
 		attendance_details = json.loads(attendance_details)
 		ref_id = attendance_details[0]['intern_details']['$id']['$oid']
-		user_details = Users.objects.exclude('pwd').get(id = ref_id)
+		user_details = users.objects.exclude('pwd').get(id = ref_id)
 		user_details = user_details.to_json()
 		for ind, _ in enumerate(attendance_details):
 			attendance_details[ind]['intern_details'] = json.loads(user_details)
@@ -148,7 +148,7 @@ def account_status(userEmail):
 	
 	print((userEmail))
 	if request.method == 'GET':
-		account_type = Users.objects.filter(email_id = userEmail)[0].account_type
+		account_type = users.objects.filter(email_id = userEmail)[0].account_type
 		return json.dumps({'success': True, 'account_type': account_type}), 201, {'ContentType': 'application/json'}
 
 	if request.method == 'PUT':
@@ -163,14 +163,14 @@ def account_status(userEmail):
 			return json.dumps({'success': False, "reason": "check account type"}), 401, {'ContentType': 'application/json'}
 
 		if userEmail == post_data['userEmail']:
-			if len(Users.objects.filter(email_id = userEmail)) > 1:
+			if len(users.objects.filter(email_id = userEmail)) > 1:
 				return json.dumps({'success': False, "reason": "userEmail is not unique"}), 401, {'ContentType': 'application/json'}
 
-			if len(Users.objects.filter(email_id = userEmail)) == 0:
+			if len(users.objects.filter(email_id = userEmail)) == 0:
 				return json.dumps({'success': False, "reason": "userEmail not present"}), 401, {'ContentType': 'application/json'}
 
-			print(Users.objects.filter(email_id = userEmail))
-			usr = Users.objects(email_id = userEmail).update_one(account_type = post_data['account_type'])
+			print(users.objects.filter(email_id = userEmail))
+			usr = users.objects(email_id = userEmail).update_one(account_type = post_data['account_type'])
 			return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}	
 		else:
 			return json.dumps({'success': False, "reason": "check userEmail in url and body"}), 401, {'ContentType': 'application/json'}
@@ -193,7 +193,7 @@ def user_edit(userEmail):
 			return json.dumps({'success': False, "reason": "email id cannot be changed"}), 401, {'ContentType': 'application/json'}
 
 		post_data['dob'] =  datetime.strptime(post_data['dob'], "%d/%m/%Y")
-		usr = Users.objects(email_id = userEmail).update(**post_data)
+		usr = users.objects(email_id = userEmail).update(**post_data)
 		# usr.save()
 
 	return json.dumps({'success': False}), 201, {'ContentType':'application/json'}
@@ -224,17 +224,29 @@ def Ngos_operations(ngoid=None):
 		ngodon_cat = []
 		for obj_str in post_data['donationCategories']:
 			don_cat.append(subCategories.objects.filter(id = obj_str)[0])
-		# for obj_str in post_data.json['category']:
-		# 	ngo.category =  subCategories.objects.filter(id = obj_str)[0]
 		for obj_str in post_data['ngoCategories']:
 			try:
 				ngodon_cat.append(subCategories.objects.filter(id = obj_str)[0])
 			except Exception as e:
 				print(e)
 			# don_cat.append()
+
 		cat_obj = categories.objects.get(id = post_data['category'])
-		ngo = NGOs(**post_data)
+		if 'contactPerson1' in post_data:
+			try:
+				cp1 = users.objects.get(email_id = post_data['contactPerson1'])
+			except Exception as e:
+				cp1 = None
+		if 'founderUserName' in post_data:
+			try:
+				fun = users.objects.get(email_id = post_data['founderUserName'])
+			except Exception as e:
+				fun = None
+			
 		
+		ngo = NGOs(**post_data)
+		ngo.contactPerson1 = cp1
+		ngo.founderUserName = fun
 		ngo.category = cat_obj
 		ngo.donationCategories = don_cat
 		ngo.ngoCategories = ngodon_cat
@@ -271,11 +283,35 @@ def Ngos_operations(ngoid=None):
 	return json.dumps({'success': False}), 201, {'ContentType':'application/json'}
 
 
-
+@app.route('/internship_add', defaults={'internshipID': None}, methods=['POST'])
 @app.route('/internship_add/<string:internshipID>', methods=['PUT'])
 @auth.login_required
-@swag_from('internship_add.yml', methods=['PUT'])
+@swag_from('internship_add.yml', methods=['PUT', 'POST'])
 def internship_add(internshipID=None):
+	if request.method == 'POST':
+		post_data = request.json
+		if 'startDate' in post_data:
+			if post_data['startDate'] is "":
+				post_data['startDate'] = None 
+			else:
+				post_data['startDate'] = datetime.strptime(post_data['startDate'], "%d/%m/%Y")
+		if 'endDate' in post_data:
+			if post_data['endDate'] is "":
+				post_data['endDate'] = None 
+			else:
+				post_data['endDate'] = datetime.strptime(post_data['endDate'], "%d/%m/%Y")	
+		if 'jobRole' in post_data:
+			post_data['jobRole'] = jobRole.objects.get(id = post_data['jobRole'])
+		if 'ngo' in post_data:
+			post_data['ngo'] = NGOs.objects.get(id = post_data['ngo'])
+		if 'admin' == g.user['account_type']:
+			post_data['status'] = "approved"
+		else:
+			post_data['status'] = "pending"
+		print(post_data)
+		temp = internships(**post_data)
+		temp.save()
+		
 	if request.method == 'PUT':
 		post_data = request.json
 		if 'startDate' in post_data:
@@ -292,7 +328,7 @@ def internship_add(internshipID=None):
 			post_data['jobRole'] = jobRole.objects.get(id = post_data['jobRole'])
 		if 'ngo' in post_data:
 			post_data['ngo'] = NGOs.objects.get(id = post_data['ngo'])
-		if 'admin' == g.user:
+		if 'admin' == g.user['account_type']:
 			post_data['status'] = "approved"
 		else:
 			post_data['status'] = "pending"
@@ -307,9 +343,8 @@ def internship_add(internshipID=None):
 @app.route('/intern_map/<string:internshipID>', methods=['PUT'])
 @auth.login_required
 @swag_from('intern_map.yml', methods=['POST', 'PUT'])
-def intern_map():
-
-	if method.request == 'POST':
+def intern_map(internshipID=None):
+	if request.method == 'POST':
 		post_data = request.json
 		if 'internshipID' not in post_data or 'userEmail' not in post_data or 'status' not in post_data:
 			json.dumps({'success': False, 'reason': 'Check keys'})
@@ -317,7 +352,7 @@ def intern_map():
 		userEmail = post_data['userEmail']
 		status = post_data['status']
 		intrn = internships.objects.get(id = internshipID)
-		usr = Users.objects.get(email_id = userEmail)
+		usr = users.objects.get(email_id = userEmail)
 		int_map = internshipMappers(internship = intrn, intern = usr, status = status).save()
 
 	if request.method == 'PUT':
@@ -326,31 +361,59 @@ def intern_map():
 		if 'userEmail' not in post_data or 'status' not in post_data:
 			json.dumps({'success': False, 'reason': 'Check keys'})
 		userEmail = post_data['userEmail']
-		usr = Users.objects.get(email_id = userEmail)
+		usr = users.objects.get(email_id = userEmail)
 		int_mapper = internshipMappers.objects.get(internship = intrn, intern = usr)
+		print(int_mapper.id)
 		int_mapper.status = post_data['status']
+		if post_data['status'] == 'approved':
+			int_mapper.accepted_by = g.user
 		if 'mentorEmail' in post_data and post_data['status'] == 'approved':
-			mentor = Users.objects.get(email_id = post_data['mentorEmail'])
+			mentor = users.objects.get(email_id = post_data['mentorEmail'])
 			int_mapper.mentor = mentor
-		int_mapper.save()
+		print(int_mapper.save())
 
 
 	return json.dumps({'sd':5}), 201, {'ContentType': 'application/json'}
 
 
-
-@app.route('/internship_details/<string:internshipID>')
+@app.route('/internship_details', defaults={'internshipID': None}, methods=['GET'])
+@app.route('/internship_details/<string:internshipID>', methods=['GET'])
 @auth.login_required
 @swag_from('internship_details.yml', methods=['GET'])
-def internship_details(internshipID):
+def internship_details(internshipID=None):
 	if request.method == 'GET':
-		intrn = internships.objects.get(id = internshipID)
+		ngoid = request.args.get('ngoid')
+		print(ngoid)
+		if ngoid is not None:
+			ngo = NGOs.objects.get(id = ngoid)
+			intrns = internships.objects.filter(ngo = ngo)
+			l = []
+			for i in intrns:
+				try:
+					l.append(internshipMappers.objects.filter(internship = i))
+				except Exception as e:
+					print(e)
+			print(l)
+			intrns = l
 
+		if internshipID is not None:
+			intrn = internships.objects.get(id = internshipID)
+			intrns = internshipMappers.objects.filter(internship = intrn)
+
+		for intern_ in intrns:
+			for a in intern_:
+				print(json.loads(a.to_json()))
+				print(a.intern.name)
+				print(a.intern.email_id)
+				print(a.intern.address)
+				print(a.intern.phone_number)
 
 	return json.dumps({'sd':5}), 201, {'ContentType': 'application/json'}
 
 
-
+@app.route('/event_create', methods=['POST'])
+def event_create():
+	pass
 
 # @app.route('/ngo_change/<string:username>', methods=['PUT'])
 # @auth.login_required
